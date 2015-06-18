@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8935C20D-F035-45AB-8CC2-49371892C448}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SL.Demos.SharePoint.SPTypeOutGrid</RootNamespace>
+    <AssemblyName>SL.Demos.SharePoint.SPTypeOutGrid</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SandboxedSolution>False</SandboxedSolution>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net35\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\DataObjects.cs" />
+    <Compile Include="CONTROLTEMPLATES\SL.Demos.SharePoint.SPTypeOutGrid\ContractEditor.ascx.cs">
+      <DependentUpon>ContractEditor.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\SL.Demos.SharePoint.SPTypeOutGrid\ContractEditor.ascx.designer.cs">
+      <DependentUpon>ContractEditor.ascx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Lists\Contracts\DisplayContractForm.aspx.cs">
+      <DependentUpon>DisplayContractForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Lists\Contracts\DisplayContractForm.aspx.designer.cs">
+      <DependentUpon>DisplayContractForm.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Lists\Contracts\EditContractForm.aspx.cs">
+      <DependentUpon>EditContractForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Lists\Contracts\EditContractForm.aspx.designer.cs">
+      <DependentUpon>EditContractForm.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Lists\Contracts\NewContractForm.aspx.cs">
+      <DependentUpon>NewContractForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Lists\Contracts\NewContractForm.aspx.designer.cs">
+      <DependentUpon>NewContractForm.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ad1c5c49-3944-44d6-b66a-4cf12ebff54e}</SharePointProjectItemId>
+    </None>
+    <None Include="Features\SL.Demos.SharePoint.SPTypeOutGrid\SL.Demos.SharePoint.SPTypeOutGrid.feature">
+      <FeatureId>{be5f45d6-a9c6-4587-87f8-4c13aba78aa4}</FeatureId>
+    </None>
+    <None Include="key.snk" />
+    <None Include="Layouts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ab9c45d5-4c39-4af0-99e7-a0cc3af91cbc}</SharePointProjectItemId>
+    </None>
+    <None Include="Lists\Contracts\ContractsInstance\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{7c3c4747-b6e9-46c5-9d07-b22e4aa7b7a4}</SharePointProjectItemId>
+    </None>
+    <None Include="Lists\Contracts\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9fe38351-b406-413a-bab6-4f27729fe2bd}</SharePointProjectItemId>
+    </None>
+    <None Include="Lists\Options\OptionsInstance\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2454c4a4-7a69-4066-8a4a-ed8b6604a431}</SharePointProjectItemId>
+    </None>
+    <None Include="Lists\Options\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fa66e794-ab74-4413-aac1-1443de5e6505}</SharePointProjectItemId>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Package\Package.package">
+      <PackageId>{0b0eaf95-8768-4fb3-8204-f551d5bc05c1}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="CONTROLTEMPLATES\SL.Demos.SharePoint.SPTypeOutGrid\ContractEditor.ascx" />
+    <Content Include="Features\SL.Demos.SharePoint.SPTypeOutGrid\SL.Demos.SharePoint.SPTypeOutGrid.Template.xml">
+      <DependentUpon>SL.Demos.SharePoint.SPTypeOutGrid.feature</DependentUpon>
+    </Content>
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\app.js" />
+    <Content Include="Lists\Contracts\DisplayContractForm.aspx" />
+    <Content Include="Lists\Contracts\EditContractForm.aspx" />
+    <Content Include="Lists\Contracts\NewContractForm.aspx" />
+    <Content Include="Lists\Contracts\ContractsInstance\Elements.xml" />
+    <Content Include="Lists\Contracts\Elements.xml" />
+    <Content Include="Lists\Contracts\Schema.xml" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\jquery-1.8.3.intellisense.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\jquery-1.8.3.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\jquery-1.8.3.min.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\knockout-3.3.0.debug.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\knockout-3.3.0.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\moment-with-locales.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\moment-with-locales.min.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\moment.js" />
+    <Content Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js\moment.min.js" />
+    <Content Include="Lists\Options\Elements.xml" />
+    <Content Include="Lists\Options\OptionsInstance\Elements.xml" />
+    <Content Include="Lists\Options\Schema.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\ts\ContractOption.ts" />
+    <TypeScriptCompile Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\ts\ContractOptionViewModel.ts" />
+    <TypeScriptCompile Include="Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\ts\KnockoutExtensions.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\EditableGrid.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\jquery.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\knockout.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\moment-node.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\moment.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\SharePoint.d.ts" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptOutDir>$(ProjectDir)Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\js</TypeScriptOutDir>
+    <TypeScriptSourceRoot>$(ProjectDir)Layouts\SL.Demos.SharePoint.SPTypeOutGrid\Scripts\ts</TypeScriptSourceRoot>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" />
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>

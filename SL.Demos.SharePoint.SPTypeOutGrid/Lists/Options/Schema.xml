@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="Options" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/Options" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <MetaData>
+    <ContentTypes>
+
+
+      <ContentType ID="0x010086d80492af1a450c941a7321e6652fab" Name="ListFieldsContentType">
+        <FieldRefs>
+          <FieldRef ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Name="Title" />
+          <FieldRef ID="{8a0f5070-0110-4171-866d-d1c25db6a87f}" Name="OptionNumber" />
+          <FieldRef ID="{26be12f7-873a-45c2-90b9-2e25221ee462}" Name="OptionType" />
+          <FieldRef ID="{387f02da-a095-49d1-9691-3935650799a5}" Name="ActiveStatus" />
+          <FieldRef ID="{ae4e1565-fa4b-42c7-8f66-b8cdc51825eb}" Name="Contract" />
+          <FieldRef ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" />
+          <FieldRef ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" />
+        </FieldRefs>
+      </ContentType>
+      <ContentTypeRef ID="0x01">
+        <Folder TargetName="Item" />
+      </ContentTypeRef>
+      <ContentTypeRef ID="0x0120" />
+    </ContentTypes>
+    <Fields>
+
+      <Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="FALSE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" />
+      <Field Name="OptionNumber" ID="{8a0f5070-0110-4171-866d-d1c25db6a87f}" DisplayName="OptionNumber" Type="Number" Required="TRUE" />
+      <Field Name="OptionType" ID="{26be12f7-873a-45c2-90b9-2e25221ee462}" DisplayName="OptionType" Type="Choice" Required="TRUE">
+        <CHOICES>
+          <CHOICE>Player</CHOICE>
+          <CHOICE>Team</CHOICE>
+        </CHOICES>
+      </Field>
+      <Field Name="ActiveStatus" ID="{387f02da-a095-49d1-9691-3935650799a5}" DisplayName="ActiveStatus" Type="Choice" Required="TRUE">
+        <CHOICES>
+          <CHOICE>Active</CHOICE>
+          <CHOICE>Deleted</CHOICE>
+        </CHOICES>
+      </Field>
+      <Field Name="Contract" ID="{ae4e1565-fa4b-42c7-8f66-b8cdc51825eb}" DisplayName="Contract" Type="Lookup" Required="TRUE" List="Lists/Contracts" ShowField="Title" />
+      <Field ID="{64cd368d-2f95-4bfc-a1f9-8d4324ecb007}" Name="StartDate" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="StartDate" Group="$Resources:core,Base_Columns;" Type="DateTime" Format="DateOnly" DisplayName="$Resources:core,Start_Date;" Required="TRUE">
+        <Default>[today]</Default>
+      </Field>
+      <Field ID="{8A121252-85A9-443d-8217-A1B57020FADF}" Name="_EndDate" Group="$Resources:core,Base_Columns;" Type="DateTime" DisplayName="$Resources:core,End_Date;" Format="DateTime" SourceID="http://schemas.microsoft.com/sharepoint/v3/fields" StaticName="_EndDate" Required="TRUE">
+        <Default>[today]</Default>
+      </Field>
+    </Fields>
+    <Views>
+
+
+      <View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+
+          <FieldRef Name="LinkTitleNoMenu"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+
+            <FieldRef Name="Modified" Ascending="FALSE"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+        </ParameterBindings>
+      </View>
+      <View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+
+
+          <FieldRef Name="Attachments"></FieldRef>
+          <FieldRef Name="LinkTitle"></FieldRef>
+          <FieldRef Name="OptionNumber" />
+          <FieldRef Name="OptionType" />
+          <FieldRef Name="ActiveStatus" />
+          <FieldRef Name="Contract" />
+          <FieldRef Name="StartDate" />
+          <FieldRef Name="_EndDate" />
+        </ViewFields>
+        <Query>
+          <OrderBy>
+
+            <FieldRef Name="ID"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+        </ParameterBindings>
+      </View>
+    </Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="EditForm" Url="EditForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+      <Form Type="NewForm" Url="NewForm.aspx" SetupPath="pages\form.aspx" WebPartZoneID="Main" />
+    </Forms>
+  </MetaData>
+</List>

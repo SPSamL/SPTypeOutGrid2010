@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="0b0eaf95-8768-4fb3-8204-f551d5bc05c1" solutionId="0b0eaf95-8768-4fb3-8204-f551d5bc05c1" resetWebServer="false" name="SL.Demos.SharePoint.SPTypeOutGrid" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="be5f45d6-a9c6-4587-87f8-4c13aba78aa4" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="ab9c45d5-4c39-4af0-99e7-a0cc3af91cbc" />
+    <projectItemReference itemId="ad1c5c49-3944-44d6-b66a-4cf12ebff54e" />
+  </projectItems>
+</package>

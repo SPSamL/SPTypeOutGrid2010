@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<List xmlns:ows="Microsoft SharePoint" Title="Contracts" FolderCreation="FALSE" Direction="$Resources:Direction;" Url="Lists/Contracts" BaseType="0" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <MetaData>
+    <ContentTypes>
+
+
+      <ContentType ID="0x0100243bb12080f947219cc457f01f085ef9" Name="ListFieldsContentType">
+        <FieldRefs>
+          <FieldRef ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Name="Title" />
+          <FieldRef ID="{1d348b61-8e23-4523-a646-5ce09419c2a4}" Name="Player" />
+          <FieldRef ID="{1af6e3fb-3486-4969-9afb-8bcf72fbf133}" Name="Agent" />
+          <FieldRef ID="{6cddcbec-0180-43c1-826a-fc6e59cdc72a}" Name="Team" />
+          <FieldRef ID="{5cff0996-9038-4672-9f87-d2c5f056bd86}" Name="ContractStartDate" />
+          <FieldRef ID="{5806550d-cb3c-406f-85b2-9db639dc7cd7}" Name="ContractEndDate" />
+        </FieldRefs>
+      </ContentType>
+      <ContentTypeRef ID="0x01">
+        <Folder TargetName="Item" />
+      </ContentTypeRef>
+      <ContentTypeRef ID="0x0120" />
+    </ContentTypes>
+    <Fields>
+
+      <Field ID="{fa564e0f-0c70-4ab9-b863-0177e6ddd247}" Type="Text" Name="Title" DisplayName="$Resources:core,Title;" Required="TRUE" SourceID="http://schemas.microsoft.com/sharepoint/v3" StaticName="Title" MaxLength="255" />
+      <Field Name="Player" ID="{1d348b61-8e23-4523-a646-5ce09419c2a4}" DisplayName="Player" Type="Text" Required="TRUE" MaxLength="255" />
+      <Field Name="Agent" ID="{1af6e3fb-3486-4969-9afb-8bcf72fbf133}" DisplayName="Agent" Type="Text" Required="TRUE" MaxLength="255" />
+      <Field Name="Team" ID="{6cddcbec-0180-43c1-826a-fc6e59cdc72a}" DisplayName="Team" Type="Choice" Required="TRUE">
+        <CHOICES>
+          <CHOICE>St. Louis Cardinals</CHOICE>
+          <CHOICE>St. Louis Blues</CHOICE>
+          <CHOICE>St. Louis Rams</CHOICE>
+          <CHOICE>Chicago sCrUBS</CHOICE>
+          <CHOICE>Chicago BlackSquawks</CHOICE>
+          <CHOICE>DA' Bears</CHOICE>
+        </CHOICES>
+      </Field>
+      <Field Name="ContractStartDate" ID="{5cff0996-9038-4672-9f87-d2c5f056bd86}" DisplayName="ContractStartDate" Type="DateTime" Required="TRUE" Format="DateOnly" />
+      <Field Name="ContractEndDate" ID="{5806550d-cb3c-406f-85b2-9db639dc7cd7}" DisplayName="ContractEndDate" Type="DateTime" Required="TRUE" Format="DateOnly" />
+    </Fields>
+    <Views>
+
+
+      <View BaseViewID="0" Type="HTML" MobileView="TRUE" TabularView="FALSE">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+
+          <FieldRef Name="LinkTitleNoMenu"></FieldRef>
+        </ViewFields>
+        <Query>
+          <OrderBy>
+
+            <FieldRef Name="Modified" Ascending="FALSE"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="AddNewAnnouncement" Location="Resource(wss,addnewitem)" />
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_ONET_HOME)" />
+        </ParameterBindings>
+      </View>
+      <View BaseViewID="1" Type="HTML" WebPartZoneID="Main" DisplayName="$Resources:core,objectiv_schema_mwsidcamlidC24;" DefaultView="TRUE" MobileView="TRUE" MobileDefaultView="TRUE" SetupPath="pages\viewpage.aspx" ImageUrl="/_layouts/images/generic.png" Url="AllItems.aspx">
+        <Toolbar Type="Standard" />
+        <XslLink Default="TRUE">main.xsl</XslLink>
+        <RowLimit Paged="TRUE">30</RowLimit>
+        <ViewFields>
+
+
+          <FieldRef Name="Attachments"></FieldRef>
+          <FieldRef Name="LinkTitle"></FieldRef>
+          <FieldRef Name="Player" />
+          <FieldRef Name="Agent" />
+          <FieldRef Name="Team" />
+          <FieldRef Name="ContractStartDate" />
+          <FieldRef Name="ContractEndDate" />
+        </ViewFields>
+        <Query>
+          <OrderBy>
+
+            <FieldRef Name="ID"></FieldRef>
+          </OrderBy>
+        </Query>
+        <ParameterBindings>
+          <ParameterBinding Name="NoAnnouncements" Location="Resource(wss,noXinviewofY_LIST)" />
+          <ParameterBinding Name="NoAnnouncementsHowTo" Location="Resource(wss,noXinviewofY_DEFAULT)" />
+        </ParameterBindings>
+      </View>
+    </Views>
+    <Forms>
+      <Form Type="DisplayForm" Url="DispForm.aspx" Path="DisplayContractForm.aspx" WebPartZoneID="Main" UseLegacyForm="TRUE" />
+      <Form Type="EditForm" Url="EditForm.aspx" Path="EditContractForm.aspx" WebPartZoneID="Main" UseLegacyForm="TRUE" />
+      <Form Type="NewForm" Url="NewForm.aspx" Path="NewContractForm.aspx" WebPartZoneID="Main" UseLegacyForm="TRUE" />
+    </Forms>
+  </MetaData>
+</List>
