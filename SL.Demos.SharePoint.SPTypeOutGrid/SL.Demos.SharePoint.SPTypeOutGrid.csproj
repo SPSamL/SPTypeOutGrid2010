@@ -153,6 +153,7 @@
     <TypeScriptCompile Include="TypeScriptMappings\moment-node.d.ts" />
     <TypeScriptCompile Include="TypeScriptMappings\moment.d.ts" />
     <TypeScriptCompile Include="TypeScriptMappings\SharePoint.d.ts" />
+    <TypeScriptCompile Include="TypeScriptMappings\SPServices.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

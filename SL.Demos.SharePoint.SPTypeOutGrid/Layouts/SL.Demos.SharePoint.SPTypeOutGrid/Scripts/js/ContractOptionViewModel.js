@@ -2,6 +2,7 @@
 /// <reference path='../../../../TypeScriptMappings/knockout.d.ts' />
 /// <reference path='../../../../TypeScriptMappings/moment.d.ts' />
 /// <reference path='../../../../TypeScriptMappings/SharePoint.d.ts' />
+/// <reference path='../../../../TypeScriptMappings/SPServices.d.ts' />
 var EditableGrid;
 (function (EditableGrid) {
     var ContractOptionViewModel = (function () {
@@ -69,9 +70,14 @@ var EditableGrid;
                     existingItem.StartDate(newStartDate);
                     existingItem.EndDate(newEndDate);
                     existingItem.IsDirty = true;
+                    var that = this;
                     if (this.formMode !== "New") {
                         var tempOption = existingItem;
-                        this.updateListItem(tempOption, true);
+                        this.updateListItem(tempOption, true).then(function (item) {
+                            that.onItemUpdated();
+                        }, function (sender, args) {
+                            that.onQueryFailed(sender, args);
+                        });
                     }
                 }
                 else {
@@ -84,10 +90,15 @@ var EditableGrid;
                         IsDirty: true,
                         OptionType: optionType
                     });
+                    var that = this;
                     if (this.formMode === "New")
-                        this.onNewItemCreated();
+                        this.onNewItemCreated(null);
                     else
-                        this.createListItem();
+                        this.createListItem().then(function () {
+                            that.onNewItemCreated(that.oListItem);
+                        }, function (sender, args) {
+                            that.onQueryFailed(sender, args);
+                        });
                 }
             }
             else {
@@ -104,12 +115,17 @@ var EditableGrid;
         ContractOptionViewModel.prototype.saveContractOption = function (currentContractOption) {
             this.editTransaction.notifySubscribers(null, "commit");
             var hasSuccess = ($("input[id='editIsSuccessful']").val() === 'true');
+            var that = this;
             if (hasSuccess) {
                 if (this.formMode === "New")
                     this.onItemUpdated();
                 else {
                     var tempOption = currentContractOption;
-                    this.updateListItem(tempOption, false);
+                    this.updateListItem(tempOption, false).then(function (item) {
+                        that.onItemUpdated();
+                    }, function (sender, args) {
+                        that.onQueryFailed(sender, args);
+                    });
                 }
             }
         };
@@ -119,11 +135,16 @@ var EditableGrid;
         };
         ContractOptionViewModel.prototype.deleteContractOption = function (currentContractOption) {
             currentContractOption.ActiveStatus('Deleted');
+            var that = this;
             if (this.formMode === "New")
                 this.onItemDeleted();
             else {
                 var tempOption = currentContractOption;
-                this.deleteListItem(tempOption);
+                this.deleteListItem(tempOption).then(function (item) {
+                    that.onItemUpdated();
+                }, function (sender, args) {
+                    that.onQueryFailed(sender, args);
+                });
             }
         };
         //#endregion
@@ -143,7 +164,7 @@ var EditableGrid;
             var baseEndDate;
             var lastPlayerOptionEndDate;
             var lastTeamOptionEndDate;
-            var contractEndDate = jQuery("input[title='ContractEndDate Required Field']").val();
+            var contractEndDate = jQuery("input[title='ContractEndDate']").val();
             if (contractEndDate && contractEndDate.length > 0 && moment(contractEndDate).isValid()) {
                 baseEndDate = moment(contractEndDate).toDate();
             }
@@ -197,7 +218,7 @@ var EditableGrid;
             var activeOYCount = this.activePlayerOptions().length;
             var activeExtCount = this.activeTeamOptions().length;
             var baseEndDate;
-            var contractEndDate = jQuery("input[title='ContractEndDate Required Field']").val();
+            var contractEndDate = jQuery("input[title='ContractEndDate']").val();
             if (contractEndDate && contractEndDate.length > 0 && moment(contractEndDate).isValid()) {
                 baseEndDate = moment(contractEndDate).toDate();
             }
@@ -255,6 +276,7 @@ var EditableGrid;
                 return false;
         };
         ContractOptionViewModel.prototype.createListItem = function () {
+            var deferred = $.Deferred();
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
             var itemCreateInfo = new SP.ListItemCreationInformation();
@@ -267,34 +289,58 @@ var EditableGrid;
             this.oListItem.set_item('Contract', this.currentContractId);
             this.oListItem.update();
             clientContext.load(this.oListItem);
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onNewItemCreated), Function.createDelegate(this, this.onQueryFailed));
+            clientContext.executeQueryAsync(Function.createDelegate(this, function () {
+                deferred.resolve(this.oListItem);
+            }), Function.createDelegate(this, function (sender, args) {
+                deferred.reject(sender, args);
+            }));
+            return deferred.promise();
         };
         ContractOptionViewModel.prototype.deleteListItem = function (tempItem) {
+            var deferred = $.Deferred();
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
-            this.oListItem = oList.getItemById(tempItem.Id);
-            this.oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
-            this.oListItem.update();
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onItemUpdated), Function.createDelegate(this, this.onQueryFailed));
+            var oListItem = oList.getItemById(tempItem.Id);
+            oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
+            oListItem.update();
+            clientContext.executeQueryAsync(Function.createDelegate(this, function () {
+                deferred.resolve(this.updateItem);
+            }), Function.createDelegate(this, function (sender, args) {
+                deferred.reject(sender, args);
+            }));
+            return deferred.promise();
         };
         ContractOptionViewModel.prototype.updateListItem = function (tempItem, isUpdatedFromAdd) {
+            var deferred = $.Deferred();
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
-            this.oListItem = oList.getItemById(tempItem.Id);
-            if (isUpdatedFromAdd || tempItem.EndDate() !== this.editingItem().EndDate())
-                this.oListItem.set_item('_EndDate', moment(tempItem.EndDate()));
-            if (isUpdatedFromAdd || tempItem.OptionNumber !== this.editingItem().OptionNumber)
-                this.oListItem.set_item('OptionNumber', tempItem.OptionNumber);
-            if (isUpdatedFromAdd || tempItem.OptionType !== this.editingItem().OptionType)
-                this.oListItem.set_item('OptionType', tempItem.OptionType);
-            if (isUpdatedFromAdd || tempItem.StartDate() !== this.editingItem().StartDate())
-                this.oListItem.set_item('StartDate', moment(tempItem.StartDate()));
-            if (isUpdatedFromAdd || tempItem.ActiveStatus() !== this.editingItem().ActiveStatus())
-                this.oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
-            this.oListItem.update();
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onItemUpdated), Function.createDelegate(this, this.onQueryFailed));
+            this.updateItem = oList.getItemById(tempItem.Id);
+            this.updateItem.set_item('_EndDate', tempItem.EndDate());
+            this.updateItem.set_item('OptionNumber', tempItem.OptionNumber);
+            this.updateItem.set_item('OptionType', tempItem.OptionType);
+            this.updateItem.set_item('StartDate', tempItem.StartDate());
+            this.updateItem.set_item('ActiveStatus', tempItem.ActiveStatus());
+            this.updateItem.update();
+            clientContext.executeQueryAsync(Function.createDelegate(this, function () {
+                deferred.resolve(this.updateItem);
+            }), Function.createDelegate(this, function (sender, args) {
+                deferred.reject(sender, args);
+            }));
+            return deferred.promise();
         };
-        ContractOptionViewModel.prototype.onNewItemCreated = function () {
+        ContractOptionViewModel.prototype.UpdateNewItemID = function () {
+            var clientContext = new SP.ClientContext(this.currentSite);
+            var oList = clientContext.get_web().get_lists().getByTitle('Options');
+            var camlQuery = new SP.CamlQuery();
+            camlQuery.set_viewXml("<View>" + "<Query>" + "< Where >" + "<And>" + "<And>" + "<Eq>" + "<FieldRef Name='Contract' LookupId= 'True' />" + "<Value Type='Lookup' >" + this.currentContractId + "< /Value>" + "< /Eq>" + "< Eq >" + "<FieldRef Name='OptionNumber' />" + "<Value Type='Number' >" + this.newOption.OptionNumber + "< /Value>" + "< /Eq>" + "< /And>" + "<Eq>" + "<FieldRef Name='OptionType' />" + "<Value Type='Choice' >" + this.newOption.OptionType + "< /Value>" + "</Eq>" + "</And>" + "< /Where>" + "</Query>" + "<ViewFields>" + "<FieldRef Name='ActiveStatus' />" + "<FieldRef Name='Contract' />" + "<FieldRef Name='_EndDate' />" + "<FieldRef Name='OptionType' />" + "<FieldRef Name='OptionNumber' />" + "<FieldRef Name='StartDate' />" + "</ViewFields>" + "</View>");
+            this.newItemCollection = oList.getItems(camlQuery);
+            clientContext.load(this.newItemCollection);
+            clientContext.executeQueryAsync(Function.createDelegate(this, this.onNewItemCreated), Function.createDelegate(this, this.onQueryFailed));
+        };
+        ContractOptionViewModel.prototype.onNewItemCreated = function (newItem) {
+            //var first: SP.ListItem = this.newItemCollection.get_item(0);
+            if (newItem != null)
+                this.newOption.Id = newItem.get_id();
             this.contractOptions.push(this.newOption);
             if (this.formMode == "New")
                 this.saveArrayToHidden();

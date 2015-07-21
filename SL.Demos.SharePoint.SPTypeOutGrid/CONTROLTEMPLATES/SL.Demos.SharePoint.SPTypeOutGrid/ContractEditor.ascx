@@ -203,7 +203,7 @@
 
         clientContext.load(collListItem);
 
-        clientContext.executeQueryAsync(Function.createDelegate(this, this.onQuerySucceeded), Function.createDelegate(this, this.onQueryFailed));
+        clientContext.executeQueryAsync(Function.createDelegate(this, this.onQuerySucceeded), Function.createDelegate(this, this.onPageQueryFailed));
 
     }
 
@@ -235,7 +235,7 @@
         $("#optionExtensionGrids").css("visibility", "visible");
     }
 
-    function onQueryFailed(sender, args) {
+    function onPageQueryFailed(sender, args) {
 
         alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
     }

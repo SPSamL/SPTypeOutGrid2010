@@ -2,7 +2,7 @@
 /// <reference path='../../../../TypeScriptMappings/knockout.d.ts' />
 /// <reference path='../../../../TypeScriptMappings/moment.d.ts' />
 /// <reference path='../../../../TypeScriptMappings/SharePoint.d.ts' />
-
+/// <reference path='../../../../TypeScriptMappings/SPServices.d.ts' />
 module EditableGrid {
 
     export class ContractOptionViewModel {
@@ -43,9 +43,10 @@ module EditableGrid {
         private currentSite: string;
 
         private oListItem: SP.ListItem;
+        private updateItem: SP.ListItem;
         private currentContractId: number;
         private newOption: EditableGrid.ContractOption;
-
+        private newItemCollection: SP.ListItemCollection;
         //#endregion
 
         //#region ContractOption grids functions and VM constructor
@@ -95,9 +96,17 @@ module EditableGrid {
                     existingItem.EndDate(newEndDate);
                     existingItem.IsDirty = true;
 
+                    var that = this;
+
                     if (this.formMode !== "New") {
                         var tempOption = existingItem;
-                        this.updateListItem(tempOption, true);
+                        this.updateListItem(tempOption, true).then(
+                            function (item) {
+                                that.onItemUpdated();
+                            },
+                            function (sender, args) {
+                                that.onQueryFailed(sender, args);
+                            });
                     }
                 }
                 else {
@@ -111,10 +120,19 @@ module EditableGrid {
                         OptionType: optionType
                     });
 
+                    var that = this;
+
                     if (this.formMode === "New")
-                        this.onNewItemCreated();
+                        this.onNewItemCreated(null);
                     else
-                        this.createListItem();
+                        this.createListItem().then(
+                            function () {
+                                that.onNewItemCreated(that.oListItem);
+                            },
+                            function (sender, args) {
+                                that.onQueryFailed(sender, args);
+                            }
+                        );
                 }
             }
             else {
@@ -135,13 +153,21 @@ module EditableGrid {
 
             var hasSuccess = ($("input[id='editIsSuccessful']").val() === 'true');
 
+            var that = this;
 
             if (hasSuccess) {
                 if (this.formMode === "New")
                     this.onItemUpdated();
                 else {
                     var tempOption = currentContractOption;
-                    this.updateListItem(tempOption, false);
+                    this.updateListItem(tempOption, false).then(
+                        function (item) {
+                            that.onItemUpdated();
+                        },
+                        function (sender, args) {
+                            that.onQueryFailed(sender, args);
+                        }
+                    );
                 }
             }
         }
@@ -155,11 +181,20 @@ module EditableGrid {
         deleteContractOption(currentContractOption: ContractOption) {
             currentContractOption.ActiveStatus('Deleted');
 
+            var that = this;
+
             if (this.formMode === "New")
                 this.onItemDeleted();
             else {
                 var tempOption = currentContractOption;
-                this.deleteListItem(tempOption);
+                this.deleteListItem(tempOption).then(
+                    function (item) {
+                        that.onItemUpdated();
+                    },
+                    function (sender, args) {
+                        that.onQueryFailed(sender, args);
+                    }
+                    );
             }
         }
         //#endregion
@@ -183,7 +218,7 @@ module EditableGrid {
             var lastPlayerOptionEndDate: Date;
             var lastTeamOptionEndDate: Date;
 
-            var contractEndDate: string = jQuery("input[title='ContractEndDate Required Field']").val();
+            var contractEndDate: string = jQuery("input[title='ContractEndDate']").val();
             if (contractEndDate && contractEndDate.length > 0 && moment(contractEndDate).isValid()) {
                 baseEndDate = moment(contractEndDate).toDate();
             }
@@ -246,7 +281,7 @@ module EditableGrid {
             var activeExtCount = this.activeTeamOptions().length;
             var baseEndDate: Date;
 
-            var contractEndDate: string = jQuery("input[title='ContractEndDate Required Field']").val();
+            var contractEndDate: string = jQuery("input[title='ContractEndDate']").val();
             if (contractEndDate && contractEndDate.length > 0 && moment(contractEndDate).isValid()) {
                 baseEndDate = moment(contractEndDate).toDate();
             }
@@ -312,6 +347,7 @@ module EditableGrid {
         }
 
         private createListItem() {
+            var deferred = $.Deferred();
 
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
@@ -330,47 +366,110 @@ module EditableGrid {
 
             clientContext.load(this.oListItem);
 
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onNewItemCreated), Function.createDelegate(this, this.onQueryFailed));
+            clientContext.executeQueryAsync(
+                Function.createDelegate(this,
+                    function () { deferred.resolve(this.oListItem); }),
+                Function.createDelegate(this,
+                    function (sender, args) { deferred.reject(sender, args); }));
+
+            return deferred.promise();
         }
 
         private deleteListItem(tempItem: EditableGrid.ContractOption) {
+
+            var deferred = $.Deferred();
+
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
 
-            this.oListItem = oList.getItemById(tempItem.Id);
-            this.oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
-            this.oListItem.update();
+            var oListItem: SP.ListItem = oList.getItemById(tempItem.Id);
+            
+            oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
+            oListItem.update();
 
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onItemUpdated), Function.createDelegate(this, this.onQueryFailed));
+            clientContext.executeQueryAsync(
+                Function.createDelegate(this,
+                    function () { deferred.resolve(this.updateItem); }),
+                Function.createDelegate(this,
+                    function (sender, args) { deferred.reject(sender, args); }));
+
+            return deferred.promise();
         }
 
         private updateListItem(tempItem: EditableGrid.ContractOption, isUpdatedFromAdd: boolean) {
+
+            var deferred = $.Deferred();
+
             var clientContext = new SP.ClientContext(this.currentSite);
             var oList = clientContext.get_web().get_lists().getByTitle('Options');
 
-            this.oListItem = oList.getItemById(tempItem.Id);
+            this.updateItem = oList.getItemById(tempItem.Id);
+            
+            this.updateItem.set_item('_EndDate', tempItem.EndDate());
+            this.updateItem.set_item('OptionNumber', tempItem.OptionNumber);
+            this.updateItem.set_item('OptionType', tempItem.OptionType);
+            this.updateItem.set_item('StartDate', tempItem.StartDate());
+            this.updateItem.set_item('ActiveStatus', tempItem.ActiveStatus());
 
-            if (isUpdatedFromAdd || tempItem.EndDate() !== this.editingItem().EndDate())
-                this.oListItem.set_item('_EndDate', moment(tempItem.EndDate()));
+            this.updateItem.update();
 
-            if (isUpdatedFromAdd || tempItem.OptionNumber !== this.editingItem().OptionNumber)
-                this.oListItem.set_item('OptionNumber', tempItem.OptionNumber);
+            clientContext.executeQueryAsync(
+                Function.createDelegate(this,
+                    function () { deferred.resolve(this.updateItem); }),
+                Function.createDelegate(this,
+                    function (sender, args) { deferred.reject(sender, args); })
+                );
 
-            if (isUpdatedFromAdd || tempItem.OptionType !== this.editingItem().OptionType)
-                this.oListItem.set_item('OptionType', tempItem.OptionType);
-
-            if (isUpdatedFromAdd || tempItem.StartDate() !== this.editingItem().StartDate())
-                this.oListItem.set_item('StartDate', moment(tempItem.StartDate()));
-
-            if (isUpdatedFromAdd || tempItem.ActiveStatus() !== this.editingItem().ActiveStatus())
-                this.oListItem.set_item('ActiveStatus', tempItem.ActiveStatus());
-
-            this.oListItem.update();
-
-            clientContext.executeQueryAsync(Function.createDelegate(this, this.onItemUpdated), Function.createDelegate(this, this.onQueryFailed));
+            return deferred.promise();
         }
 
-        private onNewItemCreated() {
+        private UpdateNewItemID() {
+            var clientContext = new SP.ClientContext(this.currentSite);
+            var oList = clientContext.get_web().get_lists().getByTitle('Options');
+
+            var camlQuery = new SP.CamlQuery();
+            camlQuery.set_viewXml("<View>" +
+                "<Query>" +
+                                    "< Where >" +
+                                        "<And>" +
+                                            "<And>" +
+                                                "<Eq>" +
+                                                    "<FieldRef Name='Contract' LookupId= 'True' />" +
+                                                    "<Value Type='Lookup' >" + this.currentContractId + "< /Value>" +
+                                                "< /Eq>" +
+                                                "< Eq >" +
+                                                    "<FieldRef Name='OptionNumber' />" +
+                                                    "<Value Type='Number' >" + this.newOption.OptionNumber + "< /Value>" +
+                                                "< /Eq>" +
+                                            "< /And>" +
+                                            "<Eq>" +
+                                                "<FieldRef Name='OptionType' />" +
+                                                "<Value Type='Choice' >" + this.newOption.OptionType + "< /Value>" +
+                                            "</Eq>" +
+                                        "</And>" +
+                "< /Where>" +
+                "</Query>" +
+                "<ViewFields>" +
+                "<FieldRef Name='ActiveStatus' />" +
+                "<FieldRef Name='Contract' />" +
+                "<FieldRef Name='_EndDate' />" +
+                "<FieldRef Name='OptionType' />" +
+                "<FieldRef Name='OptionNumber' />" +
+                "<FieldRef Name='StartDate' />" +
+                "</ViewFields>" +
+                                  "</View>");
+
+            this.newItemCollection = oList.getItems(camlQuery);
+
+            clientContext.load(this.newItemCollection);
+
+            clientContext.executeQueryAsync(Function.createDelegate(this, this.onNewItemCreated), Function.createDelegate(this, this.onQueryFailed));
+        }
+
+        private onNewItemCreated(newItem: SP.ListItem) {
+            //var first: SP.ListItem = this.newItemCollection.get_item(0);
+            if (newItem != null)
+                this.newOption.Id = newItem.get_id();
 
             this.contractOptions.push(this.newOption);
 
@@ -394,6 +493,8 @@ module EditableGrid {
 
             alert('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace());
         }
+
+
         //#endregion
     }
 }  
